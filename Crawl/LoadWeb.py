@@ -7,7 +7,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from Constant.Constant import Constant as ct
 from selenium.common.exceptions import JavascriptException, NoSuchElementException
+import pandas as pd
 import time
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.expand_frame_repr', False)  # Ngăn các cột bị cắt và xuống dòng
+
 # Khởi tạo trình duyệt (ở đây sử dụng Chrome)
 
 # Mở trang web
@@ -69,9 +74,13 @@ class loadWeb():
         )
         print(scripts)
         result = self.driver.execute_script(scripts)
-
-        tuple_result = list(zip(result[0], result[1] , result[2]))
-        print(tuple_result)
+        dict = {
+            "stt_rec": result[0],
+            "noi_dung": result[1],
+            "ngay_ht": result[2],
+        }
+        df = pd.DataFrame(dict)
+        print(df)
     def run(self):
         self.login()
         self.enter_info_nkcv()

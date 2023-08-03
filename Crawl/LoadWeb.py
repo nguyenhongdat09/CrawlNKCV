@@ -13,8 +13,8 @@ import time
 # Mở trang web
 class loadWeb():
     def __init__(self):
-        self.url = 'http://172.168.5.14:81/FSG'
-        self.url_nkcv = 'http://172.168.5.14:81/FSG/Main/nbphyc.aspx?id=05.10.01'
+        self.url = ct.url
+        self.url_nkcv = ct.url_nkcv
         options = Options()
         options.add_experimental_option("detach", True)  # khong cho tat chorme
         service_object = Service(binary_path)
@@ -69,8 +69,8 @@ class loadWeb():
         )
         print(scripts)
         result = self.driver.execute_script(scripts)
-        tuple_result = list(zip(result[0] + result[1] + result[2]))
-        
+
+        tuple_result = list(zip(result[0], result[1] , result[2]))
         print(tuple_result)
     def run(self):
         self.login()

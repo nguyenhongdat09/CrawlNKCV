@@ -7,3 +7,4 @@ class Constant:
     tu_ngay = '01/07/2023'
     den_ngay = '31/08/2023'
     trang_thai = 'HT,OK,UP'
+    ten_file_excel = 'nkcv.xlsx'

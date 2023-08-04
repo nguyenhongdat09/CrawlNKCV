@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from Constant.Constant import Constant as ct
-from selenium.common.exceptions import JavascriptException, NoSuchElementException
+from selenium.common.exceptions import JavascriptException, NoSuchElementException, TimeoutException
 import pandas as pd
 
 import datetime
@@ -34,24 +34,29 @@ class loadWeb():
         return driver, wait
 
     def login(self):
-        driver, wait = self.init_driver()
-        driver.get(self.url)
-        UserName = driver.find_element(By.ID, "LoginExtender_txtUserName")
-        UserName.send_keys(ct.user_name)
-        password = driver.find_element(By.ID, "LoginExtender_txtPassword")
-        password.send_keys(ct.password)
-        button_login = driver.find_element(By.ID, "LoginExtender_Ok")
-        button_login.click()
-        wait.until(EC.presence_of_element_located((By.ID, "LoginExtender_Attention")) )
-        WebDriverWait(driver.find_element(By.ID, "LoginExtender_Attention"), 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "Attention"))
-        )
-        js_script = "$find('LoginExtender')._login(true);"
-        driver.execute_script(js_script)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "MenuExtenderGroup")))
-        # Lấy danh sách cookie từ tab thứ nhất
-        cookies = driver.get_cookies()
-        return driver, wait, cookies
+        while True:
+            try:
+                driver, wait = self.init_driver()
+                driver.get(self.url)
+                UserName = driver.find_element(By.ID, "LoginExtender_txtUserName")
+                UserName.send_keys(ct.user_name)
+                password = driver.find_element(By.ID, "LoginExtender_txtPassword")
+                password.send_keys(ct.password)
+                button_login = driver.find_element(By.ID, "LoginExtender_Ok")
+                button_login.click()
+                wait.until(EC.presence_of_element_located((By.ID, "LoginExtender_Attention")) )
+                WebDriverWait(driver.find_element(By.ID, "LoginExtender_Attention"), 10).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "Attention"))
+                )
+                js_script = "$find('LoginExtender')._login(true);"
+                driver.execute_script(js_script)
+                wait.until(EC.presence_of_element_located((By.CLASS_NAME, "MenuExtenderGroup")))
+                # Lấy danh sách cookie từ tab thứ nhất
+                cookies = driver.get_cookies()
+                return driver, wait, cookies
+            except TimeoutException:
+                pass
+
     def enter_info_qlyc(self, driver, wait):
         driver.get(self.url_nkcv)
 
@@ -231,8 +236,8 @@ class loadWeb():
                 temp_df = pd.DataFrame([dict])
                 df = pd.concat([df, temp_df], ignore_index=True)
             tu_ngay += datetime.timedelta(days=1)
-        total_hours = sum(df['gio']) - gio_da_nhap
-        print(f'Từ ngày {ct.tu_ngay} đến ngày {ct.den_ngay} bạn còn tổng {total_hours} giờ chưa nhập. Hãy mở file excel nhập đủ {total_hours} giờ, sau đó tôi sẽ bổ giờ theo ngày tự động cho bạn')
+        total_hours = sum(df['gio'])
+        print(f'Từ ngày {ct.tu_ngay} đến ngày {ct.den_ngay} bạn phải nhập {total_hours} giờ. Hãy mở file excel nhập đủ {total_hours} giờ, sau đó tôi sẽ bổ giờ theo ngày tự động cho bạn')
         return df
 
 crawl = loadWeb()

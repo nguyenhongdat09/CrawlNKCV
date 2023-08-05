@@ -1,4 +1,3 @@
-import threading
 from openpyxl.styles import Alignment
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook import Workbook
@@ -240,5 +239,5 @@ class loadWeb():
         print(f'Từ ngày {ct.tu_ngay} đến ngày {ct.den_ngay} bạn phải nhập {total_hours} giờ. Hãy mở file excel nhập đủ {total_hours} giờ, sau đó tôi sẽ bổ giờ theo ngày tự động cho bạn')
         return df
 
-crawl = loadWeb()
-crawl.run()
+# crawl = loadWeb()
+# crawl.run()

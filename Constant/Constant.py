@@ -8,3 +8,6 @@ class Constant:
     den_ngay = '03/08/2023'
     trang_thai = 'HT,OK,UP'
     ten_file_excel = 'nkcv.xlsx'
+    ma_diem_tuple = [('0', '05'), ('1', '01'), ('2', '02'), ('3', '03'), ('4', '04'), ('5', '05')]
+    nh_cv1 = 'DUAN'
+    nh_cv2 = 'LTLAMMOI'

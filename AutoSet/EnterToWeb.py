@@ -75,5 +75,5 @@ class entertoweb:
         else:
             return None
 
-enter = entertoweb()
-enter.run()
+# enter = entertoweb()
+# enter.run()

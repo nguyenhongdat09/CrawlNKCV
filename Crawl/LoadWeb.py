@@ -11,13 +11,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from Constant.Constant import Constant as ct
 from selenium.common.exceptions import JavascriptException, NoSuchElementException, TimeoutException
 import pandas as pd
-
+import os
 import datetime
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.expand_frame_repr', False)  # Ngăn các cột bị cắt và xuống dòng
 
-
+chromedriver_path = os.getcwd() + '/chromedriver.exe'
 class loadWeb():
     def __init__(self):
         self.url = ct.url
@@ -26,9 +26,9 @@ class loadWeb():
     def init_driver(self):
         options = Options()
         options.add_experimental_option("detach", True)  # khong cho tat chorme
-        service_object = Service(binary_path)
         options.add_argument("--start-maximized")  # Thêm tùy chọn để mở cửa sổ lớn nhất
-        driver = webdriver.Chrome(options=options, service=service_object)
+        service_object = Service(binary_path)
+        driver = webdriver.Chrome(options = options, service=service_object)
         wait = WebDriverWait(driver, 10)
         return driver, wait
 

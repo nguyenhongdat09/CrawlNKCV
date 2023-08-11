@@ -56,7 +56,6 @@ class readExcel:
                 df_ngay.loc[df_ngay['ngay'] == df['ngay'].values[0], 'stt_rec'] +=   ',' + stt_rec
                 df_ngay.loc[df_ngay['ngay'] == df['ngay'].values[0], 'noi_dung'] += ',' + noi_dung
                 df_ngay.loc[df_ngay['ngay'] == df['ngay'].values[0], 'diem'] += ',' + str(diem)
-
                 df_ngay.loc[df_ngay['ngay'] == df['ngay'].values[0], 'gio_pb_arr'] += ',' + f'{gio_phan_bo}'
         return df_ngay
     def set_diem(self, row):
@@ -71,6 +70,7 @@ class readExcel:
             return '05'
     def get_df_nkcv_finish(self):
         df = self.allocate_nkcv()
+        df = df.loc[df['stt_rec'] != '']
         df = df.explode('stt_rec', ignore_index=True)
         df['stt_rec'] = df['stt_rec'].str.split(',').str[1:]
         df['gio_pb_arr'] = df['gio_pb_arr'].str.split(',').str[1:]
@@ -80,19 +80,21 @@ class readExcel:
         df = df.explode('stt_rec', ignore_index=True)
         # Đánh stt
         df["stt"] = df.groupby("ngay")["ngay"].rank(method="first", ascending=True)
+
         df['gio_pb_arr'] = df.apply(lambda row: row['gio_pb_arr'][int(row['stt']-1)], axis=1)
+
         df['diem'] = df.apply(lambda row: row['diem'][int(row['stt'] - 1)], axis=1)
         df['noi_dung'] = df.apply(lambda row: row['noi_dung'][int(row['stt'] - 1)], axis=1)
-        df['ma_diem'] = df.apply(lambda row: self.set_diem(row), axis=1)
         df["stt"] = df.groupby("stt_rec")["stt_rec"].rank(method="first", ascending=True)
         df_group_by_stt_rec = df.groupby("stt_rec")['stt'].max().reset_index()
         df_group_by_stt_rec['trang_thai'] = 'HT'
         df = df.merge(df_group_by_stt_rec, how='left', left_on=['stt_rec','stt'], right_on=['stt_rec','stt'])
         df['trang_thai'] = df['trang_thai'].fillna('TH')
+        df.loc[df['trang_thai'] == 'TH', 'diem'] = '0'
+        df['ma_diem'] = df.apply(lambda row: self.set_diem(row), axis=1)
         df['nh_cv1'], df['nh_cv2'], df['ma_nv'] = ct.nh_cv1, ct.nh_cv2, ct.user_name
         df.drop('gio_phan_bo', axis=1, inplace=True)
         df.drop('stt', axis=1, inplace=True)
         return df
-# reader = readExcel()
-#
-# reader.split_stt_rec()
+reader = readExcel()
+reader.get_df_nkcv_finish()

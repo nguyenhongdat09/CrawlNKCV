@@ -3,7 +3,6 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook import Workbook
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from chromedriver_py import binary_path
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -27,15 +26,18 @@ class loadWeb():
         options = Options()
         options.add_experimental_option("detach", True)  # khong cho tat chorme
         options.add_argument("--start-maximized")  # Thêm tùy chọn để mở cửa sổ lớn nhất
-        service_object = Service(binary_path)
+        # service_object = Service(binary_path)
+        dir = os.path.dirname(__file__)
+        chrome_path = os.path.join(dir, 'selenium', 'webdriver', 'chromedriver_win32.exe')
+        service_object = Service(chrome_path)
         driver = webdriver.Chrome(options = options, service=service_object)
         wait = WebDriverWait(driver, 10)
         return driver, wait
 
     def login(self):
+        driver, wait = self.init_driver()
         while True:
             try:
-                driver, wait = self.init_driver()
                 driver.get(self.url)
                 UserName = driver.find_element(By.ID, "LoginExtender_txtUserName")
                 UserName.send_keys(ct.user_name)
@@ -44,7 +46,7 @@ class loadWeb():
                 button_login = driver.find_element(By.ID, "LoginExtender_Ok")
                 button_login.click()
                 wait.until(EC.presence_of_element_located((By.ID, "LoginExtender_Attention")) )
-                WebDriverWait(driver.find_element(By.ID, "LoginExtender_Attention"), 10).until(
+                WebDriverWait(driver.find_element(By.ID, "LoginExtender_Attention"), 3).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "Attention"))
                 )
                 js_script = "$find('LoginExtender')._login(true);"
@@ -190,6 +192,7 @@ class loadWeb():
         gio_da_nhap = sum(df_nkcv['so_gio'])
         self.hour_calculate(gio_da_nhap)
         self.export_excel(df_qlyc, df_nkcv)
+        driver.quit()
     def export_excel(self, df_qlyc, df_nkcv):
         # Tạo một workbook mới
         wb = Workbook()
@@ -236,7 +239,7 @@ class loadWeb():
                 df = pd.concat([df, temp_df], ignore_index=True)
             tu_ngay += datetime.timedelta(days=1)
         total_hours = sum(df['gio'])
-        print(f'Từ ngày {ct.tu_ngay} đến ngày {ct.den_ngay} bạn phải nhập {total_hours} giờ. Hãy mở file excel nhập đủ {total_hours} giờ, sau đó tôi sẽ bổ giờ theo ngày tự động cho bạn')
+        print(f'Từ ngày {ct.tu_ngay} đến ngày {ct.den_ngay} bạn phải nhập "{total_hours}" giờ. Hãy mở file excel "{ct.ten_file_excel}" nhập đủ "{total_hours}" giờ, sau đó tôi sẽ bổ giờ theo ngày tự động cho bạn')
         return df
 
 # crawl = loadWeb()

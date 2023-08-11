@@ -5,7 +5,7 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.workbook import Workbook
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from chromedriver_py import binary_path
+
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -59,7 +59,6 @@ class entertoweb:
             button_re_new.click()
 
     def run(self):
-
         reader = readExcel()
         df = reader.get_df_nkcv_finish()
         df['ngay'] = pd.to_datetime(df['ngay']).dt.strftime('%d/%m/%Y')

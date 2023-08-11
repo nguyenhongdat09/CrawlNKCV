@@ -1,17 +1,10 @@
-import pandas as pd
-import selenium
-from openpyxl.styles import Alignment
-from openpyxl.utils.dataframe import dataframe_to_rows
-from openpyxl.workbook import Workbook
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
+import time
 
-from selenium.webdriver.chrome.options import Options
+import pandas as pd
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from Constant.Constant import Constant as ct
-from selenium.common.exceptions import JavascriptException, NoSuchElementException, TimeoutException
 from Crawl.LoadWeb import loadWeb
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -30,20 +23,21 @@ class entertoweb:
             stt_rec, ngay, gio, diem, ma_diem, trang_thai, nh_cv1, nh_cv2, ma_nv = row['stt_rec'], row['ngay'], row['gio_pb_arr'], int(float(row['diem'])), row['ma_diem'], row['trang_thai'], row['nh_cv1'], row['nh_cv2'], row['ma_nv']
             input_ma_yc = wait.until(
                 EC.presence_of_element_located((By.ID, "ctl00_FastBusiness_MainReport_dirExtender_form_stt_rec_yc")))
-            print(stt_rec)
+            print(row.to_frame().T)
             input_ngay_ct = driver.find_element(By.ID, 'ctl00_FastBusiness_MainReport_dirExtender_form_ngay_ct')
             input_ngay_ht = driver.find_element(By.ID, 'ctl00_FastBusiness_MainReport_dirExtender_form_ngay_ht')
-            input_ma_nv = driver.find_element(By.ID, 'ctl00_FastBusiness_MainReport_dirExtender_form_ma_nhv')
-            input_so_gio = driver.find_element(By.ID, 'ctl00_FastBusiness_MainReport_dirExtender_form_so_gio')
             input_ma_diem = driver.find_element(By.ID, 'ctl00_FastBusiness_MainReport_dirExtender_form_ma_plyc')
             input_diem = driver.find_element(By.ID, 'ctl00_FastBusiness_MainReport_dirExtender_form_diem')
             input_nh_cv1 = driver.find_element(By.ID, 'ctl00_FastBusiness_MainReport_dirExtender_form_nh_cv1')
             input_nh_cv2 = driver.find_element(By.ID, 'ctl00_FastBusiness_MainReport_dirExtender_form_nh_cv2')
+            input_so_gio = driver.find_element(By.ID, 'ctl00_FastBusiness_MainReport_dirExtender_form_so_gio')
             input_ma_yc.send_keys(stt_rec)
             input_ma_yc.send_keys(Keys.ENTER)
             driver.execute_script("arguments[0].value = arguments[1];", input_ngay_ct, ngay)
             driver.execute_script("arguments[0].value = arguments[1];", input_ngay_ht, ngay)
-
+            input_trang_thai = driver.find_element(By.ID, 'ctl00_FastBusiness_MainReport_dirExtender_form_trang_thai')
+            select = Select(input_trang_thai)
+            select.select_by_value(trang_thai)
             input_ma_diem.send_keys(Keys.ENTER)
             input_ma_diem.send_keys(ma_diem)
             input_ma_diem.send_keys(Keys.ENTER)

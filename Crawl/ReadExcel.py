@@ -1,6 +1,8 @@
+import pandas
 import pandas as pd
 from Constant.Constant import Constant as ct
 import numpy as np
+import sys
 pd.set_option('display.max_columns', None)
 pd.set_option('display.expand_frame_repr', False)
 pd.set_option('display.max_rows', None)
@@ -29,7 +31,18 @@ class readExcel:
     def read_excel(self, sheet_name):
         df = pd.read_excel(ct.ten_file_excel, sheet_name = sheet_name, usecols= ["stt_rec", "ma_da", "noi_dung", "ngay_ht", "so_gio", "diem"])
         df["ngay_ht"] = pd.to_datetime(df["ngay_ht"], format="%d/%m/%Y")
-        return df
+        df['so_gio'] =  df['so_gio'].fillna(0)
+        row_empty_hour:pandas.DataFrame = df.loc[df['so_gio'] <= 0]
+        if not row_empty_hour.empty:
+            print(row_empty_hour)
+            a = input("Các dòng trên chưa nhập giờ hãy xem lại. Có muốn vẫn tiếp tục không (1: Có, 0: Không): ")
+            while a not in ('0', '1'):
+                a = input("Nhập chưa đúng. Có muốn vẫn tiếp tục không (1: Có, 0: Không): ")
+            if a == '1':
+                return df
+            else:
+                sys.exit()
+
     def update_nkcv_da_nhap(self, df_nkcv, df_ngay):
         df_loc = df_nkcv.loc[df_nkcv['stt_rec'].str.contains('NK1') > 0, ['ngay_ht', 'so_gio']]
         merged_df = df_ngay.merge(df_loc, how='left', left_on='ngay', right_on='ngay_ht')
@@ -96,5 +109,5 @@ class readExcel:
         df.drop('gio_phan_bo', axis=1, inplace=True)
         df.drop('stt', axis=1, inplace=True)
         return df
-reader = readExcel()
-reader.get_df_nkcv_finish()
+# reader = readExcel()
+# reader.get_df_nkcv_finish()

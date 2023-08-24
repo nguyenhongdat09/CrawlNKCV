@@ -55,7 +55,11 @@ class readExcel:
         df_ngay = self.update_nkcv_da_nhap(df_nkcv, df_ngay)
         df_ngay = df_ngay.loc[df_ngay['gio'] > 0]
         df_ngay['gio_phan_bo'], df_ngay['stt_rec'], df_ngay['noi_dung'], df_ngay['gio_pb_arr'], df_ngay['diem']= 0, '', '', '', ''
-        df_nkcv = df_nkcv.loc[df_nkcv['stt_rec'].str.contains('YC1') > 0]
+        df_nk = df_nkcv.loc[df_nkcv['stt_rec'].str.contains('NK1') > 0]
+        df_yc = df_nkcv.loc[df_nkcv['stt_rec'].str.contains('YC1') > 0]
+        result = pd.merge(df_nk, df_yc, on='noi_dung', how='inner')
+        rows_to_drop = df_yc[df_yc['noi_dung'].isin(result['noi_dung'])].index
+        df_nkcv = df_yc.drop(rows_to_drop)
         df_nkcv['diem'] = df_nkcv['diem'].fillna(0)
         for index, row in df_nkcv.iterrows():
             stt_rec, so_gio, diem, noi_dung = row['stt_rec'], row['so_gio'], row['diem'], row['noi_dung']
@@ -71,6 +75,8 @@ class readExcel:
                 df_ngay.loc[df_ngay['ngay'] == df['ngay'].values[0], 'diem'] += ',' + str(diem)
                 df_ngay.loc[df_ngay['ngay'] == df['ngay'].values[0], 'gio_pb_arr'] += ',' + f'{gio_phan_bo}'
         return df_ngay
+
+
     def set_diem(self, row):
         ma_diem_dict = dict(ct.ma_diem_tuple)
         diem = float(row['diem'])
@@ -93,9 +99,7 @@ class readExcel:
         df = df.explode('stt_rec', ignore_index=True)
         # Đánh stt
         df["stt"] = df.groupby("ngay")["ngay"].rank(method="first", ascending=True)
-
         df['gio_pb_arr'] = df.apply(lambda row: row['gio_pb_arr'][int(row['stt']-1)], axis=1)
-
         df['diem'] = df.apply(lambda row: row['diem'][int(row['stt'] - 1)], axis=1)
         df['noi_dung'] = df.apply(lambda row: row['noi_dung'][int(row['stt'] - 1)], axis=1)
         df["stt"] = df.groupby("stt_rec")["stt_rec"].rank(method="first", ascending=True)
